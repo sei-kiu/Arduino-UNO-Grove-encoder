@@ -1,9 +1,13 @@
 #include <Arduino.h>
 
+#include "rgb_lcd.h"
+
 #define ENCODER1_SIGA 2
 #define ENCODER1_SIGB 3
 #define ENCODER2_SIGA 4
 #define ENCODER2_SIGB 5
+
+rgb_lcd lcd;
 
 volatile int encoder1Value = 0;
 volatile int encoder1Flag = 0;
@@ -21,6 +25,9 @@ void setup()
     // put your setup code here, to run once:
     Serial.begin(115200);
 
+    // set up the LCD's number of columns and rows:
+    lcd.begin(16, 2);
+
     pinMode(ENCODER1_SIGA, INPUT_PULLUP);
     pinMode(ENCODER1_SIGB, INPUT_PULLUP);
     pinMode(ENCODER2_SIGA, INPUT_PULLUP);
@@ -37,11 +44,22 @@ void loop()
     // put your main code here, to run repeatedly:
     while (1)
     {
-        Serial.print(" Encoder1 Value: ");
+        Serial.print(" Encoder1Value: ");
         Serial.print(encoder1Value);
-        Serial.print(" Encoder2 Value: ");
+        Serial.print(" Encoder2Value: ");
         //Serial.println(encoder2Value);
         Serial.print(encoder2Value);
+
+        // Print to LCD
+        // (note: line 1 is the second row, since counting begins with 0):
+        lcd.setCursor(0, 0);
+        lcd.print("Encoder1 Val:   ");
+        lcd.setCursor(13, 0);
+        lcd.print(encoder1Value);
+        lcd.setCursor(0, 1);
+        lcd.print("Encoder2 Val:   ");
+        lcd.setCursor(13, 1);
+        lcd.print(encoder2Value);
 
         // Encoder 1: Using interrupt: Process only once per loop
         if (encoder1Flag == 1)
