@@ -29,7 +29,7 @@ void setup()
     encoder2sigAPrev = digitalRead(ENCODER2_SIGA);
     encoder2sigBPrev = digitalRead(ENCODER2_SIGB);
 
-    attachInterrupt(digitalPinToInterrupt(ENCODER1_SIGA), ISR_ENCODER1, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(ENCODER1_SIGA), ISR_ENCODER1, LOW);
 }
 
 void loop()
@@ -40,7 +40,8 @@ void loop()
         Serial.print(" Encoder1 Value: ");
         Serial.print(encoder1Value);
         Serial.print(" Encoder2 Value: ");
-        Serial.println(encoder2Value);
+        //Serial.println(encoder2Value);
+        Serial.print(encoder2Value);
 
         // Encoder 1: Using interrupt: Process only once per loop
         if (encoder1Flag == 1)
@@ -51,34 +52,40 @@ void loop()
         // Encoder 2: Check within loop
         encoder2sigANew = digitalRead(ENCODER2_SIGA);
         encoder2sigBNew = digitalRead(ENCODER2_SIGB);
-        if (encoder2sigAPrev != encoder2sigANew)
+        Serial.print(" Encoder2 sigA: ");
+        Serial.print(encoder2sigANew);
+        Serial.print(" Encoder2 sigB: ");
+        Serial.println(encoder2sigBNew);
+        if (encoder2sigBPrev != encoder2sigBNew)
         {
-            encoder2sigAPrev = encoder2sigANew;
-            if (encoder2sigBNew == encoder2sigANew)
+            encoder2sigBPrev = encoder2sigBNew;
+            if (encoder2sigBNew == 0)      // only chck when sigB goes LOW
             {
-                if (encoder2Value == 100)
+                if (encoder2sigANew == 1) // clockwise
                 {
-                    encoder2Value = 0;
+                    if (encoder2Value == 100)
+                    {
+                        encoder2Value = 0;
+                    }
+                    else
+                    {
+                        encoder2Value++;
+                    }
                 }
-                else
+                else // anti-clockwise
                 {
-                    encoder2Value++;
+                    if (encoder2Value == 0)
+                    {
+                        encoder2Value = 100;
+                    }
+                    else
+                    {
+                        encoder2Value--;
+                    }
                 }
-            }
-            else
-            {
-                if (encoder2Value == 0)
-                {
-                    encoder2Value = 100;
-                }
-                else
-                {
-                    encoder2Value--;
-                }
+                delay(100);
             }
         }
-
-        delay(100);
     }
 }
 
